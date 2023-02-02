@@ -107,6 +107,8 @@ func makeProviderCmd() *cobra.Command {
 			LogHandler:           logs.NewLogHandlerFunc(faasdlogs.New(), config.ReadTimeout),
 		}
 
+		bootstrap.Router().HandleFunc("/watchdog-info", handlers.MakeWatchDogInfoHandler())
+
 		log.Printf("Listening on TCP port: %d\n", *config.TCPPort)
 		bootstrap.Serve(&bootstrapHandlers, config)
 		return nil

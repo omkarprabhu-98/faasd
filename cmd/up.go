@@ -107,6 +107,8 @@ func runUp(cmd *cobra.Command, _ []string) error {
 	go localResolver.Start()
 
 	proxies := map[uint32]*pkg.Proxy{}
+	log.Println("================== PROXIES: ", proxies)
+	log.Println("================== SERVICES: ", services)
 	for _, svc := range services {
 		for _, port := range svc.Ports {
 
