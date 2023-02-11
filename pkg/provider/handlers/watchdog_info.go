@@ -19,7 +19,9 @@ func MakeWatchDogInfoHandler() http.HandlerFunc {
 		}
 
 		info, err := parseInfo(r)
+		log.Println("=================== IP ==========", readUserIP(r))
 		log.Println("=================== INFO ==========", info)
+
 		if err != nil {
 			log.Printf("[Watchdog Info] error %s", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -40,4 +42,16 @@ func parseInfo(r *http.Request) (Info, error) {
 	}
 
 	return info, err
+}
+
+// Ref: https://stackoverflow.com/questions/27234861/correct-way-of-getting-clients-ip-addresses-from-http-request
+func readUserIP(r *http.Request) string {
+	ipAddress := r.Header.Get("X-Real-Ip")
+	if ipAddress == "" {
+		ipAddress = r.Header.Get("X-Forwarded-For")
+	}
+	if ipAddress == "" {
+		ipAddress = r.RemoteAddr
+	}
+	return ipAddress
 }
