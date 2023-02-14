@@ -20,6 +20,7 @@ import (
 	"github.com/openfaas/faasd/pkg/provider/config"
 	"github.com/openfaas/faasd/pkg/provider/handlers"
 	"github.com/openfaas/faasd/pkg/provider/proxy"
+	storage "github.com/openfaas/faasd/pkg/provider/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -93,6 +94,27 @@ func makeProviderCmd() *cobra.Command {
 			return err
 		}
 
+		db, err := storage.Init()
+		if err != nil {
+			return err
+		}
+
+		// f := &storage.Func{ 
+		// 	Id: "First",
+		// }
+
+		// err = storage.InsertFunc(db, f)
+		// if err != nil {
+		// 	return err
+		// }
+
+		fs, err := storage.GetAllFunc(db)
+		if err != nil {
+			return err
+		}
+		log.Print("Functions: ", fs[0])
+
+
 		bootstrapHandlers := types.FaaSHandlers{
 			FunctionProxy:        proxy.NewHandlerFunc(*config, invokeResolver),
 			DeleteHandler:        handlers.MakeDeleteHandler(client, cni),
@@ -109,7 +131,7 @@ func makeProviderCmd() *cobra.Command {
 		}
 
 		bootstrap.Router().HandleFunc("/watchdog-info", handlers.MakeWatchDogInfoHandler())
-
+ 
 		log.Printf("Listening on TCP port: %d\n", *config.TCPPort)
 		bootstrap.Serve(&bootstrapHandlers, config)
 		return nil
